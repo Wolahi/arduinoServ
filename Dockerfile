@@ -1,19 +1,15 @@
-FROM python:3.10
+FROM python:3.12
 
-RUN mkdir /fastapi_app
+RUN mkdir /arduinoApp
 
-WORKDIR /fastapi_app
+WORKDIR /arduinoApp
 
 COPY requirements.txt .
 
-RUN pip3 install -r requirements.txt
+RUN pip install -r requirements.txt
 
 COPY . .
 
-RUN chmod a+x docker/*.sh
+CMD alembic upgrade head
 
-RUN alembic upgrade head
-
-WORKDIR src
-
-CMD gunicorn main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000
+CMD gunicorn src.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000
