@@ -1,16 +1,15 @@
+import datetime
+from sqlalchemy import select
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
-
-
 from .database import get_async_session
-from .friends.modles import FriendTable
-from .friends.shemas import Friend
+from .temp.modeles import TempTable, temp
+from .temp.shemas import TempValue, TempTableValue
 
 app = FastAPI(
-    title="VK TESt"
+    title="ARDUINO TEST"
 )
-
 
 origins = ["http://localhost:3000"]
 
@@ -24,13 +23,18 @@ app.add_middleware(
 )
 
 
-@app.post("/friends")
-async def create_friends(friends: Friend, db: AsyncSession = Depends(get_async_session)):
-    friendUser = FriendTable(user_id=friends.user_id, friend_id=friends.friend_id)
-    userFriend = FriendTable(user_id=friends.friend_id, friend_id=friends.user_id)
-    db.add(friendUser)
-    db.add(userFriend)
+@app.post('/temp')
+async def put_temp(meteo_value: TempValue, db: AsyncSession = Depends(get_async_session)):
+    tempTable = TempTable(temp_value=meteo_value.value, date=str(datetime.datetime.now()))
+    db.add(tempTable)
     await db.commit()
-    await db.refresh(friendUser)
-    await db.refresh(userFriend)
+    await db.refresh(tempTable)
 
+
+@app.get('/now/temp')
+async def get_temp(db: AsyncSession = Depends(get_async_session)):
+    temp_value = await db.execute(select(temp).order_by(temp.c.id.desc()).limit(1))
+    result = temp_value.all().__getitem__(0)
+    converted_res = TempTableValue(id=result.id,value=result.temp_value,date=result.date)
+    # SELECT * FROM item ORDER BY id DESC LIMIT 1
+    return converted_res
