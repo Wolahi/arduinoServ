@@ -6,6 +6,9 @@ services:
     env_file:
       - .env-non-dev
     restart: always
+    volumes:
+      - /tmp/postgresql:/var/lib/postgresql
+      - /tmp/postgresql/data:/var/lib/postgresql/data
   app:
     build:
       context: .
