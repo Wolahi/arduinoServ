@@ -11,7 +11,7 @@ app = FastAPI(
     title="ARDUINO TEST"
 )
 
-origins = ["http://localhost:3000"]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
