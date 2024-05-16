@@ -30,6 +30,8 @@ async def put_temp(meteo_value: TempValue, db: AsyncSession = Depends(get_async_
     await db.commit()
     await db.refresh(tempTable)
 
+    return {"result": "ВСЕ ХОРОШО!"}
+
 
 @app.get('/now/temp')
 async def get_temp(db: AsyncSession = Depends(get_async_session)):
@@ -38,3 +40,4 @@ async def get_temp(db: AsyncSession = Depends(get_async_session)):
     converted_res = TempTableValue(id=result.id,value=result.temp_value,date=result.date)
     # SELECT * FROM item ORDER BY id DESC LIMIT 1
     return converted_res
+
