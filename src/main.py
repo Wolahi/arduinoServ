@@ -11,15 +11,12 @@ app = FastAPI(
     title="ARDUINO TEST"
 )
 
-origins = ["*"]
 
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS", "DELETE", "PATCH", "PUT"],
-    allow_headers=["Content-Type", "Set-Cookie", "Access-Control-Allow-Headers", "Access-Control-Allow-Origin",
-                   "Authorization"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -37,7 +34,6 @@ async def put_temp(meteo_value: TempValue, db: AsyncSession = Depends(get_async_
 async def get_temp(db: AsyncSession = Depends(get_async_session)):
     temp_value = await db.execute(select(temp).order_by(temp.c.id.desc()).limit(1))
     result = temp_value.all().__getitem__(0)
-    converted_res = TempTableValue(id=result.id,value=result.temp_value,date=result.date)
+    converted_res = TempTableValue(id=result.id, value=result.temp_value, date=result.date)
     # SELECT * FROM item ORDER BY id DESC LIMIT 1
     return converted_res
-
