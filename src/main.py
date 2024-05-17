@@ -11,7 +11,6 @@ app = FastAPI(
     title="ARDUINO TEST"
 )
 
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -37,4 +36,14 @@ async def get_temp(db: AsyncSession = Depends(get_async_session)):
     result = temp_value.all().__getitem__(0)
     converted_res = TempTableValue(id=result.id, value=result.temp_value, date=result.date)
     # SELECT * FROM item ORDER BY id DESC LIMIT 1
+    return converted_res
+
+
+@app.post('/temp/list')
+async def get_list_temp(db: AsyncSession = Depends(get_async_session)):
+    temp_value = await db.execute(select(temp).order_by(temp.c.date.desc()).limit(5))
+    result = temp_value.all()
+    converted_res = []
+    for i in range(0, 5):
+        converted_res.append(TempTableValue(id=result.__getitem__(i).id, value=result.__getitem__(i).temp_value, date=result.__getitem__(i).date))
     return converted_res
